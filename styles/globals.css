@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.btnhehe {
+    background-color: #F9A826;
+    color: #fff;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    margin: 10px;
+    z-index: 1;
+
+    ;
+}
+
+
+.part {
+    position: fixed;
+    width: 100%;
+    z-index: -1;
+}

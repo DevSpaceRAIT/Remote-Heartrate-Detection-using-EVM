@@ -1,5 +1,15 @@
-import formidable from "formidable";
+import AWS from "aws-sdk";
+import formidable from "formidable-serverless";
+import fs from "fs";
 import axios from "axios";
+
+const s3 = new AWS.S3({
+  region: "ap-south-1",
+  credentials: {
+    accessKeyId: process.env.S3_ACCESS_KEY,
+    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+  },
+});
 
 export const config = {
   api: {
@@ -22,29 +32,37 @@ export default async function handler(req, res) {
       // get the video file from the incoming form data
       const video = files.video;
 
-      // create a new form data object and append the video file to it
-      const formData = new FormData();
-      formData.append("video", video, video.name);
+      // read the contents of the file
+      const fileContent = fs.readFileSync(video.path);
 
-      try {
-        // send the form data containing the video file to your server
-        const response = await axios.post(
-          "http://localhost:4000/upload",
-          formData,
-          {
-            headers: formData.getHeaders(),
+      // Upload the file to S3
+      const putObjectParams = {
+        Bucket: "evm-rohit-next-bucket",
+        Key: video.name,
+        Body: fileContent,
+        ContentType: video.type,
+      };
+      await s3.putObject(putObjectParams).promise()
+        .then(async() => {
+          console.log(`File uploaded to S3: ${video.name} (${video.type})`);
+          // send a POST request to the endpoint
+          try {
+            const response = await axios.post("https://b988-117-220-211-114.ngrok-free.app/localnode", {
+              shouldTrigger: true, // replace with your boolean value
+            });
+            console.log(response.data);
+            res.json(response.data);
+          } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: "Internal Server Error" });
           }
-        );
-
-        console.log(response.data);
-
-        res.status(200).json({ message: "Video uploaded successfully" });
-      } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Server error" });
-      }
+        })
+        .catch((err) => {
+          console.error(err);
+          res.status(500).json({ error: "Server error" });
+        });
     });
   } else {
-    res.status(404).json({ error: "Not found" });
+    res.status(405).json({ error: "Method not allowed" });
   }
 }

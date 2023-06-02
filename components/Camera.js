@@ -51,7 +51,7 @@ export default function Camera() {
 
       try {
         const response = await axios.post(
-          "http://localhost:4000/upload",
+          "/api/upload",
           formData,
           {
             headers: {

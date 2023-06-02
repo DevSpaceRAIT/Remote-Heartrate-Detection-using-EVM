@@ -10,7 +10,7 @@ const s3 = new AWS.S3({
     secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
   },
 });
-
+const localURL = process.env.URL;
 export const config = {
   api: {
     bodyParser: false,
@@ -47,7 +47,7 @@ export default async function handler(req, res) {
           console.log(`File uploaded to S3: ${video.name} (${video.type})`);
           // send a POST request to the endpoint
           try {
-            const response = await axios.post("https://b988-117-220-211-114.ngrok-free.app/localnode", {
+            const response = await axios.post(localURL, {
               shouldTrigger: true, // replace with your boolean value
             });
             console.log(response.data);

@@ -1,6 +1,7 @@
 import AWS from "aws-sdk";
 import formidable from "formidable-serverless";
 import fs from "fs";
+import axios from "axios";
 
 const s3 = new AWS.S3({
   region: "ap-south-1",
@@ -41,12 +42,25 @@ export default async function handler(req, res) {
         Body: fileContent,
         ContentType: video.type,
       };
-      await s3.putObject(putObjectParams).promise();
-
-      // Log the file information to the console
-      console.log(`File uploaded to S3: ${video.name} (${video.type})`);
-
-      res.status(200).json({ message: "File uploaded successfully!" });
+      await s3.putObject(putObjectParams).promise()
+        .then(async() => {
+          console.log(`File uploaded to S3: ${video.name} (${video.type})`);
+          // send a POST request to the endpoint
+          try {
+            const response = await axios.post("https://b988-117-220-211-114.ngrok-free.app/localnode", {
+              shouldTrigger: true, // replace with your boolean value
+            });
+            console.log(response.data);
+            res.json(response.data);
+          } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: "Internal Server Error" });
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+          res.status(500).json({ error: "Server error" });
+        });
     });
   } else {
     res.status(405).json({ error: "Method not allowed" });

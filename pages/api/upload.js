@@ -2,7 +2,9 @@ import AWS from "aws-sdk";
 import formidable from "formidable-serverless";
 import fs from "fs";
 import axios from "axios";
-
+export const config ={
+  runtime:"edge";
+};
 const s3 = new AWS.S3({
   region: "ap-south-1",
   credentials: {

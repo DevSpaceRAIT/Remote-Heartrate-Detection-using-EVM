@@ -47,7 +47,7 @@ export default async function handler(req, res) {
           console.log(`File uploaded to S3: ${video.name} (${video.type})`);
           // send a POST request to the endpoint
           try {
-            const response = await axios.post(localURL, {
+            const response = await axios.post(localURL+"/localnode", {
               shouldTrigger: true, // replace with your boolean value
             });
             console.log(response.data);

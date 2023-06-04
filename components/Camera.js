@@ -1,13 +1,16 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import axios from "axios";
 
+
 export default function Camera() {
+  const localURL = process.env.URL;
   const webcamRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const [capturing, setCapturing] = useState(false);
   const [recordedChunks, setRecordedChunks] = useState([]);
   const [heartRate, setHeartRate] = useState(null);
+  const [isPingSuccessful, setIsPingSuccessful] = useState(null);
   const handleDataAvailable = useCallback(
     ({ data }) => {
       if (data.size > 0) {
@@ -17,6 +20,25 @@ export default function Camera() {
     [setRecordedChunks]
   );
 
+
+  useEffect(() => {
+    const pingURL = async () => {
+      try {
+        const response = await axios.get("/api/pingcheck"); 
+        console.log(response.data.success); // Replace with your desired URL
+        if (response.data.success) {
+
+          setIsPingSuccessful(true);
+        } else {
+          setIsPingSuccessful(false);
+        }
+      } catch (error) {
+        setIsPingSuccessful(false);
+      }
+    };
+
+    pingURL();
+  }, []);
   
 
   // const handleStopCaptureClick = useCallback(() => {
@@ -83,6 +105,7 @@ export default function Camera() {
       setCapturing(false);
     }
   }, [webcamRef, setCapturing, mediaRecorderRef, handleDataAvailable, handleDownload]);
+
   return (
     <div className=" flex-col h-screen flex items-center justify-center px-2">
       <Webcam
@@ -131,6 +154,13 @@ export default function Camera() {
       </h1>
     </div>
   )}
+
+  <div>
+      {isPingSuccessful === true && <span class="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">Server is Online!</span>}
+      {isPingSuccessful === false && <span class="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">Server is Offline!</span>}
     </div>
+    </div>
+
   );
+  
 }

@@ -3,7 +3,10 @@ import formidable from "formidable-serverless";
 import fs from "fs";
 import axios from "axios";
 export const config ={
-  runtime:"edge";
+  runtime:"edge",
+  api: {
+    bodyParser: false,
+  },
 };
 const s3 = new AWS.S3({
   region: "ap-south-1",
@@ -13,11 +16,7 @@ const s3 = new AWS.S3({
   },
 });
 const localURL = process.env.URL;
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+
 
 export default async function handler(req, res) {
   if (req.method === "POST") {

@@ -3,7 +3,7 @@ import formidable from "formidable-serverless";
 import fs from "fs";
 import axios from "axios";
 export const config ={
-  runtime:"edge",
+  
   api: {
     bodyParser: false,
   },

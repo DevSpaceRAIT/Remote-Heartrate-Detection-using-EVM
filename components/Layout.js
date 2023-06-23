@@ -1,3 +1,4 @@
+'use client'
 import Camera from "./Camera";
 import Gpt from "./Gpt";
 

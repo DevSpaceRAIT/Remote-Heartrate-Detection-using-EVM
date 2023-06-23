@@ -2,7 +2,12 @@ import AWS from "aws-sdk";
 import formidable from "formidable-serverless";
 import fs from "fs";
 import axios from "axios";
-
+export const config ={
+  
+  api: {
+    bodyParser: false,
+  },
+};
 const s3 = new AWS.S3({
   region: "ap-south-1",
   credentials: {
@@ -11,11 +16,7 @@ const s3 = new AWS.S3({
   },
 });
 const localURL = process.env.URL;
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+
 
 export default async function handler(req, res) {
   if (req.method === "POST") {
@@ -47,7 +48,7 @@ export default async function handler(req, res) {
           console.log(`File uploaded to S3: ${video.name} (${video.type})`);
           // send a POST request to the endpoint
           try {
-            const response = await axios.post(localURL, {
+            const response = await axios.post(localURL+"/localnode", {
               shouldTrigger: true, // replace with your boolean value
             });
             console.log(response.data);
